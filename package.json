@@ -15,6 +15,7 @@
   "dependencies": {
     "@tensorflow-models/posenet": "^2.2.2",
     "@tensorflow/tfjs": "^4.22.0",
+    "@napi-rs/canvas": "^0.1.48",
     "express": "^5.1.0",
     "multer": "^2.0.2",
     "serverless-http": "^3.2.0"

@@ -2,7 +2,7 @@ import express from "express";
 import multer from "multer";
 import * as tf from "@tensorflow/tfjs";
 import * as posenet from "@tensorflow-models/posenet";
-import { createCanvas, loadImage } from "canvas";
+import { createCanvas, loadImage } from "@napi-rs/canvas";
 import serverless from "serverless-http";
 
 const app = express();
