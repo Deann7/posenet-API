@@ -85,4 +85,6 @@ app.post("/pose", upload.single("image"), async (req, res) => {
   }
 });
 
-export default serverless(app);
+export default serverless(app, {
+  callbackWaitsForEmptyEventLoop: false,
+});
