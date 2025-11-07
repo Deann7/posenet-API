@@ -3,23 +3,21 @@ import multer from "multer";
 import * as tf from "@tensorflow/tfjs";
 import * as posenet from "@tensorflow-models/posenet";
 import { createCanvas, loadImage } from "canvas";
-import fs from "fs";
+import serverless from "serverless-http";
 
 const app = express();
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ storage: multer.memoryStorage() });
 
-let net;
-
-// Load PoseNet model when server starts
-(async () => {
+const modelPromise = (async () => {
   console.log("Loading PoseNet model...");
-  net = await posenet.load({
+  const model = await posenet.load({
     architecture: "MobileNetV1",
     outputStride: 16,
     inputResolution: { width: 257, height: 200 },
     multiplier: 0.75,
   });
   console.log("✅ PoseNet model loaded!");
+  return model;
 })();
 
 // Helper to calculate Euclidean distance
@@ -34,7 +32,8 @@ app.post("/pose", upload.single("image"), async (req, res) => {
       return res.status(400).json({ error: "No image uploaded" });
     }
 
-    const image = await loadImage(req.file.path);
+    const net = await modelPromise;
+    const image = await loadImage(req.file.buffer);
     const canvas = createCanvas(image.width, image.height);
     const ctx = canvas.getContext("2d");
     ctx.drawImage(image, 0, 0);
@@ -75,9 +74,6 @@ app.post("/pose", upload.single("image"), async (req, res) => {
       accepted: confidenceDecimal >= ACCEPTANCE_THRESHOLD,
     };
 
-    // Clean up uploaded image
-    fs.unlinkSync(req.file.path);
-
     return res.json(result);
   } catch (error) {
     console.error("Pose estimation error:", error);
@@ -85,7 +81,4 @@ app.post("/pose", upload.single("image"), async (req, res) => {
   }
 });
 
-// Run the server
-app.listen(3000, () =>
-  console.log("🚀 PoseNet API running at http://localhost:3000")
-);
+export default serverless(app);
