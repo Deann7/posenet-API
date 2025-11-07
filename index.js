@@ -20,6 +20,10 @@ const modelPromise = (async () => {
   return model;
 })();
 
+app.get("/", (req, res) => {
+  res.json({ message: "PoseNet API ready", endpoint: "/pose" });
+});
+
 // Helper to calculate Euclidean distance
 function euclideanDistance(a, b) {
   return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
